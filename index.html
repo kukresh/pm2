@@ -105,7 +105,7 @@
           <div>
             <span class="text-[11px] font-bold uppercase tracking-widest text-rose-500">Стратегия и прогревы</span>
             <h1 class="font-editorial text-3xl font-bold text-zinc-900 mt-0.5">Генератор контент-плана для мастера ПМ</h1>
-            <p class="text-xs text-zinc-500 mt-1">Задайте задачу в поле промпта ниже, для выбора локального шаблона на неделю. Текстовый план не расходует баланс Gemini.</p>
+            <p class="text-xs text-zinc-500 mt-1">Опишите тему, аудиторию, количество публикаций и стиль. Gemini составит новый план по вашему запросу. Текст и изображения имеют отдельные квоты API.</p>
           </div>
         </div>
 
@@ -127,15 +127,15 @@
           <textarea id="plan-master-prompt" rows="3" class="w-full p-3.5 bg-white border border-zinc-200 rounded-xl text-xs text-zinc-800 focus:outline-none focus:border-rose-500 leading-relaxed" placeholder="Опишите, какой контент-план нужен: целевая аудитория, акцент на процедуру, акции, закрытие возражений...">Составить план на неделю: 3 публикации для мастера перманентного макияжа — губы, брови и уход.</textarea>
 
           <div class="flex flex-wrap items-center justify-between gap-3 pt-1">
-            <span class="text-[11px] text-zinc-500" id="plan-engine-note">Локальный план: 3 публикации на неделю, без запросов ИИ</span>
+            <span class="text-[11px] text-zinc-500" id="plan-engine-note">План через Gemini • ваш запрос целиком отправляется текстовой модели</span>
             <button onclick="generatePlanFromPrompt()" id="btn-generate-plan" class="px-5 py-2.5 rounded-xl bg-gradient-to-r from-rose-600 to-pink-600 hover:from-rose-500 hover:to-pink-500 text-white text-xs font-semibold flex items-center gap-2 shadow-md shadow-rose-200 transition">
-              <i data-lucide="wand-2" class="w-4 h-4"></i> Составить экономный план
+              <i data-lucide="wand-2" class="w-4 h-4"></i> Сгенерировать новый план
             </button>
           </div>
         </div>
 
         <!-- Generated Cards Grid -->
-        <div id="plan-cards-container" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+        <p id="plan-status" role="status" aria-live="polite" class="text-sm text-rose-700">Ниже стартовый пример. Для своего плана введите запрос и нажмите «Сгенерировать новый план».</p><div id="plan-cards-container" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
           <!-- Cards populated via JS -->
         </div>
       </div>
@@ -332,10 +332,10 @@
 <p class="text-sm text-zinc-600">Введите свой API-ключ Gemini. Он хранится только в памяти вкладки и передаётся напрямую Google. Для изображений нужны доступ к модели и доступная квота API.</p>
 <label for="gemini-key" class="block text-xs font-semibold">API-ключ Gemini</label><input id="gemini-key" type="password" autocomplete="off" placeholder="AIza…" class="w-full p-3 border rounded-xl" />
 <label for="gemini-model" class="block text-xs font-semibold">Модель изображений</label><input id="gemini-model" value="gemini-2.5-flash-image" class="w-full p-3 border rounded-xl" />
-<button onclick="applyGeminiSettings()" class="px-4 py-2 bg-rose-600 text-white rounded-xl">Применить ключ</button><button onclick="clearGeminiKey()" class="px-4 py-2 border rounded-xl">Удалить ключ</button><p id="gemini-status" role="status" class="text-xs text-zinc-600">Ключ не задан</p>
+<label for="gemini-text-model" class="block text-xs font-semibold">Модель контент-плана</label><input id="gemini-text-model" value="gemini-2.5-flash" class="w-full p-3 border rounded-xl" /><button onclick="applyGeminiSettings()" class="px-4 py-2 bg-rose-600 text-white rounded-xl">Применить ключ</button><button onclick="clearGeminiKey()" class="px-4 py-2 border rounded-xl">Удалить ключ</button><p id="gemini-status" role="status" class="text-xs text-zinc-600">Ключ не задан</p>
 <label for="generation-budget" class="block text-sm font-semibold">Максимум попыток за сеанс</label>
 <select id="generation-budget" onchange="setGenerationBudget(this.value)" class="w-full p-3 border rounded-xl"><option value="1">1 картинка → 3 публикации с общим фото</option><option value="2">2 картинки → 3 публикации</option><option value="3" selected>3 картинки → 3 публикации</option><option value="5">5 картинок → 3 публикации + запас</option></select>
-<p class="text-xs text-zinc-500">Это ваш предел запросов в этой вкладке, а не квота Gemini. Попытки учитываются даже при ошибке; автоматических повторов нет. План и изменение макета не расходуют генерации.</p>
+<p class="text-xs text-zinc-500">Это ваш предел запросов в этой вкладке, а не квота Gemini. Попытки учитываются даже при ошибке; автоматических повторов нет. План расходует отдельную текстовую квоту Gemini. Изменение макета не отправляет запросы.</p>
 <a href="https://aistudio.google.com" target="_blank" rel="noopener noreferrer" class="text-xs underline">Открыть аккаунт Gemini и проверить баланс</a>
 </div>
 <div class="card-white rounded-3xl p-6 space-y-4"><h2 class="text-lg font-bold">Публикация на GitHub Pages</h2><p class="text-sm text-zinc-600">Загрузите файлы из подготовленного архива в репозиторий. В Settings → Pages выберите GitHub Actions. Инструкция есть в README.md.</p><p class="text-xs text-zinc-500">Каждый посетитель вводит собственный API-ключ. Не добавляйте ключ в HTML, README или GitHub Secrets: этот статический сайт не использует серверные секреты.</p></div>
@@ -351,6 +351,8 @@
     let currentImg = null; // Изначально null — сгенерированные/фейковые картинки удалены!
     let geminiKey='';
     let geminiModel='gemini-2.5-flash-image';
+    let geminiTextModel='gemini-2.5-flash';
+    let planBusy=false;
     let imageAttempts=Number(sessionStorage.getItem('pmu_image_attempts')||0);
     let imageSuccesses=Number(sessionStorage.getItem('pmu_image_successes')||0);
     let generationBlocked=false;
@@ -405,6 +407,23 @@
       const btn = document.getElementById('btn-generate-plan');
       const container = document.getElementById('plan-cards-container');
 
+      if(useAiIfAvailable) {
+        if(planBusy) return;
+        const status=document.getElementById('plan-status');
+        if(!promptInput){status.textContent='Введите новый запрос для плана.';return;}
+        if(!geminiKey){status.textContent='Для нового плана примените API-ключ в разделе «Gemini и лимиты». Сейчас показан пример, а не результат вашего запроса.';return;}
+        planBusy=true;btn.disabled=true;status.textContent='Gemini составляет план по вашему запросу…';
+        try {
+          const cards=await callGeminiPlan(promptInput);
+          activePlanList=cards;
+          const slots=Math.max(1,Math.min(cards.length,generationBudget-imageAttempts));
+          activePlanList.forEach((c,i)=>{c.imageSlot=i%slots+1;c.reuse=i>=slots;});
+          renderPlanCards();status.textContent='Готово: '+cards.length+' публикаций по вашему запросу. Текстовый запрос не расходует счётчик фото; квота текста учитывается Google отдельно.';
+        } catch(e) {status.textContent='План не обновлён: '+(e.name==='TimeoutError'?'Gemini не ответил за 90 секунд.':e.message||'Ошибка сети. Проверьте подключение к Google API.')+' Предыдущий план сохранён.';}
+        finally {planBusy=false;btn.disabled=false;}
+        return;
+      }
+      // Только стартовый пример: никогда не подменяет результат запроса.
       // Локальная генерация карточек на основе ключевых слов из промпта
       const lower = promptInput.toLowerCase();
       let cards = [];
@@ -452,6 +471,23 @@
       renderPlanCards();
     }
 
+    async function callGeminiPlan(userPrompt) {
+      const fields=['day','badge','title','subtitle','prompt'];
+      const properties=Object.fromEntries(fields.map(name=>[name,{type:'STRING'}]));
+      properties.format={type:'STRING',enum:['post','story','carousel']};
+      const res=await fetch('https://generativelanguage.googleapis.com/v1beta/models/'+encodeURIComponent(geminiTextModel)+':generateContent',{
+        method:'POST',headers:{'Content-Type':'application/json','x-goog-api-key':geminiKey},signal:AbortSignal.timeout(90000),
+        body:JSON.stringify({systemInstruction:{parts:[{text:'Ты редактор контент-плана мастера перманентного макияжа. Выполни конкретный запрос пользователя: тема, аудитория, стиль, даты, количество и форматы имеют приоритет. Если количество не указано, создай 3 публикации на неделю. Максимум 30 публикаций. Верни JSON-массив. В каждом объекте day — день/дата, format — post/story/carousel, badge — краткая рубрика, title — заголовок, subtitle — содержательная идея/текст публикации, prompt — подробное описание фото на английском без надписей. Не придумывай фактические результаты работ, гарантии безопасности, скидки, цены и свободные даты, если их нет в запросе. Бюджет картинок не ограничивает количество текстовых публикаций.'}]},contents:[{role:'user',parts:[{text:userPrompt}]}],generationConfig:{responseMimeType:'application/json',responseSchema:{type:'ARRAY',items:{type:'OBJECT',properties,required:[...fields,'format']}},maxOutputTokens:10000}})
+      });
+      const data=await res.json().catch(()=>({}));
+      if(!res.ok)throw new Error(res.status===429?'Исчерпана квота текстовой модели Gemini. Проверьте лимиты Google AI Studio.':res.status===401||res.status===403?'Ключ недействителен или у него нет доступа к текстовой модели.':data.error?.message||'Ошибка API '+res.status);
+      const candidate=data.candidates?.[0];
+      if(candidate?.finishReason && candidate.finishReason!=='STOP')throw new Error('Gemini не завершил план: '+candidate.finishReason+'. Сократите запрос.');
+      const raw=(candidate?.content?.parts||[]).filter(p=>!p.thought).map(p=>p.text||'').join('');
+      let cards;try {cards=JSON.parse(raw.replace(/^```(?:json)?\s*|```\s*$/g,''));}catch{throw new Error('Gemini вернул неполный JSON. Уточните или сократите запрос.');}
+      if(!Array.isArray(cards)||cards.length<1||cards.length>30||cards.some(c=>!c||!['post','story','carousel'].includes(c.format)||fields.some(k=>typeof c[k]!=='string'||!c[k].trim())))throw new Error('Gemini вернул некорректный план. Повторите запрос вручную.');
+      return cards;
+    }
     function escapeHtml(value) {return String(value ?? '').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
     function renderPlanCards() {
       const container = document.getElementById('plan-cards-container');
@@ -572,13 +608,15 @@
       document.getElementById('generation-counter').textContent='За сеанс: '+imageAttempts+' / '+generationBudget+' попыток, готово '+imageSuccesses+' фото. Остаток баланса Gemini здесь не определяется.';
     }
     function setGenerationBudget(value) {
-      generationBudget=Math.max(1,Math.min(10,Number(value)||3));localStorage.setItem('pmu_budget',String(generationBudget));updateGenerationCounter();generatePlanFromPrompt(false);
+      generationBudget=Math.max(1,Math.min(10,Number(value)||3));localStorage.setItem('pmu_budget',String(generationBudget));updateGenerationCounter();if(activePlanList.length){const slots=Math.max(1,Math.min(activePlanList.length,generationBudget-imageAttempts));activePlanList.forEach((c,i)=>{c.imageSlot=i%slots+1;c.reuse=i>=slots;});renderPlanCards();}
     }
     function applyGeminiSettings() {
       const key=document.getElementById('gemini-key').value.trim();
       const model=document.getElementById('gemini-model').value.trim();
       if(!key || !/^[a-zA-Z0-9._-]+$/.test(model)){document.getElementById('gemini-status').textContent='Введите ключ и корректное имя модели.';return;}
-      geminiKey=key;geminiModel=model;generationBlocked=false;
+      const textModel=document.getElementById('gemini-text-model').value.trim();
+      if(!/^[a-zA-Z0-9._-]+$/.test(textModel)){document.getElementById('gemini-status').textContent='Укажите корректную текстовую модель.';return;}
+      geminiKey=key;geminiModel=model;geminiTextModel=textModel;generationBlocked=false;
       document.getElementById('gemini-key').value='';
       document.getElementById('gemini-status').textContent='Ключ применён до перезагрузки вкладки';
       document.getElementById('sidebar-ai-status').textContent='Gemini';
